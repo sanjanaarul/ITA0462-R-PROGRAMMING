@@ -1,0 +1,48 @@
+# Load required libraries
+library(ggplot2)
+library(dplyr)
+library(titanic)
+
+# Load Titanic dataset
+data("titanic_train")
+titanic_data <- titanic_train
+
+# a. Bar chart for Survived based on passenger Class
+class_survival <- titanic_data %>%
+  group_by(Pclass, Survived) %>%
+  summarise(count = n()) %>%
+  mutate(Survived = factor(Survived, labels = c("No", "Yes")))
+
+p1 <- ggplot(class_survival, aes(x = Pclass, y = count, fill = Survived)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Survival on Titanic based on Passenger Class",
+       x = "Passenger Class",
+       y = "Count") +
+  scale_fill_manual(values = c("No" = "red", "Yes" = "green")) +
+  theme_minimal()
+
+# b. Bar chart for Survived based on passenger Class and Gender
+gender_class_survival <- titanic_data %>%
+  group_by(Pclass, Survived, Sex) %>%
+  summarise(count = n()) %>%
+  mutate(Survived = factor(Survived, labels = c("No", "Yes")))
+
+p2 <- ggplot(gender_class_survival, aes(x = Pclass, y = count, fill = Survived)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Survival on Titanic based on Passenger Class and Gender",
+       x = "Passenger Class",
+       y = "Count") +
+  scale_fill_manual(values = c("No" = "red", "Yes" = "green")) +
+  facet_grid(rows = vars(Sex)) +
+  theme_minimal()
+
+# c. Histogram plot for Age distribution
+p3 <- ggplot(titanic_data, aes(x = Age)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black") +
+  labs(title = "Age Distribution on Titanic",
+       x = "Age",
+       y = "Count") +
+  theme_minimal()
+
+# Display the plots
+grid.arrange(p1, p2, p3, ncol = 1)
